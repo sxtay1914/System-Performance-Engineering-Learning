@@ -4,11 +4,13 @@ Use the daily rhythm in START-HERE. Every day includes recall, reading, practice
 
 ## Day 1: Performance methodology
 
-- [ ] **Understand:** USE; utilisation versus saturation; latency versus throughput; symptoms versus causes.
+- [x] **Understand:** USE; utilisation versus saturation; latency versus throughput; symptoms versus causes.
 - [ ] **Read:** Methodology and observability; use the reading map to select a short section.
-- [ ] **Practise:** Record a baseline using top, vmstat and pidstat where available; identify what each measures.
-- [ ] **Demonstrate:** Explain your first three checks for a slow backend.
-- [ ] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
+- [x] **Practise:** Record a baseline using top, vmstat and pidstat where available; identify what each measures.
+- [x] **Demonstrate:** Explain your first three checks for a slow backend (with tutor guidance).
+- [x] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
+
+Session completed on 2026-11-14; book reading remains unconfirmed. See the Day 1 evidence and handoff in [the progress tracker](05-PROGRESS-TRACKER.md).
 
 **AI prompt:** “Start Day 1: Performance methodology. Follow the tutor contract, check my prerequisites, and guide one exercise at a time. Assess whether I can explain your first three checks for a slow backend.”
 
