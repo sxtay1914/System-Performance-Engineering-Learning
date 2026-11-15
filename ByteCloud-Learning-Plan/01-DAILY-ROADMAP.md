@@ -17,10 +17,12 @@ Session completed on 2026-11-14; book reading remains unconfirmed. See the Day 1
 ## Day 2: Linux execution model
 
 - [ ] **Understand:** Kernel/user space; processes and threads; states; system calls; signals; file descriptors; permissions.
-- [ ] **Read:** Operating systems; use the reading map to select a short section.
+- [x] **Read:** Operating systems; use the reading map to select a short section.
 - [ ] **Practise:** Inspect a small service with ps/pstree/lsof; trace a process you own with strace; compare graceful termination and forced exit on a disposable process.
 - [ ] **Demonstrate:** Explain a process state, an open descriptor and SIGTERM versus SIGKILL.
-- [ ] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
+- [x] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
+
+Guided session finished on 2026-11-15. Reading was reported complete; process/thread, descriptor and syscall inspections were performed. Signal comparison and full demonstration remain pending, so the day is not yet marked complete. Continue to Day 3 with these gaps carried forward. See [the evidence and handoff](05-PROGRESS-TRACKER.md).
 
 **AI prompt:** “Start Day 2: Linux execution model. Follow the tutor contract, check my prerequisites, and guide one exercise at a time. Assess whether I can explain a process state, an open descriptor and SIGTERM versus SIGKILL.”
 
