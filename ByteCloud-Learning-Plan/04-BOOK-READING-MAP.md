@@ -2,7 +2,7 @@
 
 Use Brendan Gregg's *Systems Performance: Enterprise and the Cloud* as the main reference for Linux resource behaviour and performance methodology. Do not read it cover to cover for this sprint.
 
-Exact chapter numbers and pages are deliberately omitted because the edition and table of contents were not supplied. Ask AI to map these subject areas only after you provide that information.
+The local PDF table of contents was verified on 2026-11-16: ISBN 978-0-13-339009-4, copyright 2014, second printing January 2014. The PDF is incomplete; verified section references below identify reading in the complete book, not text available locally. Page numbers are printed book pages.
 
 | Days | Find these subject areas in your edition | Read for | Depth |
 |---|---|---|---|
@@ -42,3 +42,11 @@ Use existing networking course material for TCP/IP, DNS, CIDR, ARP, NAT and rout
 
 ## Prompt for precise mapping
 “My edition is [edition]. Here is the table of contents: [paste]. Map the subject areas above to actual sections. Preserve the 21-day schedule and daily reading time. Mark optional sections and do not invent missing titles or page numbers.”
+
+## Verified Day 3 reading: Chapter 6 — CPUs (p. 189)
+
+Read first: 6.2.3 CPU Run Queues (p. 192); 6.3.6 Utilization (p. 195); 6.3.7 User-Time/Kernel-Time (p. 196); 6.3.8 Saturation (p. 196); 6.3.9 Preemption (p. 196); 6.3.11 Multiprocess, Multithreading (p. 197).
+
+Use during practicals: 6.6.1 uptime (p. 224); 6.6.2 vmstat (p. 226); 6.6.3 mpstat (p. 227); 6.6.6 top (p. 231); 6.6.8 pidstat (p. 234).
+
+Scheduling refresher: 3.2.9 Schedulers (p. 98). Optional depth: 6.4.2 Software (p. 209); its internal subheadings are not listed in the contents. Defer advanced hardware architecture and tuning.

@@ -7,7 +7,7 @@ Mark a day complete when you can explain its concept, perform the exercise and i
 |---|---|---|---|---|---|---|
 | 1 | Performance methodology | 1 | 1 | 0 | [x] | Study Days 2, 4, 8 |
 | 2 | Linux execution model | 1 | 1 | 1 | [ ] | Study Days 3, 5, 9 |
-| 3 | CPU and scheduling | — | — | — | [ ] | — |
+| 3 | CPU and scheduling | 1 | 1 | 1 | [x] | Study Days 4, 6, 10 |
 | 4 | Memory | — | — | — | [ ] | — |
 | 5 | Filesystems and storage | — | — | — | [ ] | — |
 | 6 | Linux investigation practice | — | — | — | [ ] | — |
@@ -84,6 +84,39 @@ Day 1's guided concepts and baseline are complete. Start Day 2: Linux execution 
 ### Handoff
 
 Continue with Day 3. Use practice-led tutoring: short theory, explain each command and why it answers the current question, ask for a prediction, inspect actual output, then interpret it. The learner prefers technical practicals without neglecting theory; avoid unnecessary eventfd depth and repeated conceptual quizzes. Outline relevant reading topics rather than inventing section/page references from the incomplete PDF. Day 2's guided session is finished, but its full completion checklist remains open for signals and independent demonstration.
+
+## Day 3 — 2026-11-16
+
+- Status: guided session completed, including the requested load-average calculation and application flame graph. Independent diagnosis and optimisation have not been demonstrated.
+- Time spent: not recorded.
+- Environment: Kali ARM64 VM, kernel `6.19.14+kali-arm64`, two available logical CPUs (`nproc`). Installed `linux-perf`; compiler and FlameGraph scripts used successfully. Tool versions not recorded.
+- Reading: learner reported completing the assigned CPU sections. Exact titles and starting pages were checked against the local PDF table of contents; see the Day 3 mapping in [the reading map](04-BOOK-READING-MAP.md).
+- Objective: distinguish utilisation from saturation, connect system/process/per-CPU measurements, and identify application CPU code paths.
+- Predictions: learner correctly predicted that four runnable single-threaded workers on two CPUs allow two to execute while approximately two wait; explained that adding CPUs alone does not parallelise one busy thread.
+- Commands and actual evidence:
+  - Initial `vmstat 1 5`, excluding the first report: `r=1`, `us=27–29`, `sy=22–24`, `id=49–50`, `b=0`, `wa=0`, `st=0`. This was an active workload, not an idle baseline.
+  - `pidstat -u 1 5`: learner identified PID 491823 (`zsh`); averages were `%usr=54.89`, `%system=45.11`, `%CPU=100.00`, `%wait=0.00`. Explained that one CPU's worth of process execution corresponds to about 50% of this two-CPU machine.
+  - `mpstat -P ALL 1 5`: CPU 0 had 0% idle; CPU 1 had 98–100% idle; aggregate idle was about 49–50%. CPU 0 user work appeared in `%nice`, with substantial `%sys` time. Exact nice value was not supplied.
+  - `taskset -pc 491823`: allowed CPU list was `0,1`; learner reported one thread from ps. Most-recent CPU does not imply permanent affinity. Loop was reported as `while true; do :; done` running in the background.
+  - After stopping the original loop, learner reported 98% idle. This before/after comparison supports the loop as the source of activity; its substantial kernel-time share was not independently explained.
+  - Four bash busy workers, each bounded by `timeout -s KILL 15s`: interval vmstat reports showed `r=4`, `id=0`, `us=100`, `sy=0–1`, `cs=660–682/sec`. Runnable count includes executing plus queued tasks; on two CPUs this supports CPU saturation. Separate percentage rounding can produce a displayed total above 100%.
+  - Load-average exercise: 64 CPUs at 50% utilisation gives 32 CPUs' worth of execution; adding two queued threads gives approximately 34 at steady state without significant uninterruptible waits. Learner initially answered 2 for the executing portion, then accepted the correction. The supplied wording is ambiguous if 2 means all runnable threads, not queued-only; original exercise text was not independently verified. No steady-state load average was measured in the short lab.
+  - Profiling access: `perf_event_paranoid=3`; unprivileged collection failed. `sudo perf stat -e task-clock:u -- sleep 1` succeeded with 0.27 ms task CPU time and 1.002191307 seconds elapsed. No persistent kernel-setting change was instructed.
+  - A standalone C demo used noinline `heavy_work` and `light_work`, with four million versus one million iterations per call, for roughly 15 seconds. Compiled with `-O2 -g -fno-omit-frame-pointer`; learner confirmed compilation. Program ran as normal user; sudo perf attached to its PID.
+  - `perf record -e cpu-clock:u -F 99 --call-graph dwarf -p "$demo_pid" -o perf.data -- sleep 10`: supplied summary reported 989 samples and 8.046 MB. Corrected command-entry mistakes before successful collection.
+  - Converted using perf script and Brendan Gregg's FlameGraph scripts. Tutor inspected the supplied [flame graph](../flamegraph.svg): `main → heavy_work` 79.68%, `main → light_work` 20.32%. SVG weights are aggregated event periods, not 9.99 billion independent samples. Some ancestor frames were unresolved; target function names were clear.
+  - `pidstat -w` observing `sleep 10`: learner reported zero context switches in the observed intervals; full output was not supplied. Discussed that the initial block and final wake can fall outside the observation window. A sleeping task wakes for its event/timer, not merely because CPU capacity is free.
+- Interpretation: the single-thread workload filled one CPU despite spare aggregate capacity; four runnable workers exceeded available execution capacity. Flame graph width reflects sampled CPU weight including callees, not time order or whole-machine utilisation.
+- Optimisation reasoning: hypothetical halving of an 80% hot path reduces fixed-work runtime from 10 to 6 seconds (about 1.67x speedup). It need not use more CPUs. Our fixed-duration demo would instead complete more work; no optimisation or speedup was actually measured.
+- Cleanup: original loop stop was followed by the reported idle recovery. Four-worker and demo workloads were time-bounded; final process-list cleanup was not supplied. Source, executable, perf data and conversion artifacts were intentionally retained in Kali; only the supplied SVG is included with this progress update.
+- Explanation / evidence / investigation scores: **1 / 1 / 1** (guided). top was not separately exercised; ps, pidstat, vmstat and mpstat supplied the process and CPU observations.
+- Remaining gaps: observe involuntary switches and per-thread scheduling wait under contention; independently reproduce profiling and explain unresolved frames; verify final lab-process cleanup. Day 2 signal comparison remains pending.
+- Next action: Day 4 memory. Outline exact reading sections from the verified contents, then explain commands and collect a baseline before a bounded allocation experiment. Ask for evidence before diagnosing memory pressure.
+- Review: study Days 4, 6 and 10. Revisit runnable versus queued, process versus system CPU percentages, and flame graph inclusive widths versus execution time.
+
+### Handoff
+
+Day 3 guided practicals are complete. Start Day 4 in the same Kali VM. Keep the practice-led format: explain the technical purpose and command syntax, predict, measure, interpret. The learner needs commands that are easy to type and may use the VMware shared project folder to transfer longer source files. Preserve the Day 2 signal gap and Day 3 independent-investigation gaps; do not imply a measured optimisation or fully resolved call stacks.
 
 ## Session entry template
 Copy once per session. Schedule recall roughly 1, 3 and 7 study days later; shorten review if recall is strong.

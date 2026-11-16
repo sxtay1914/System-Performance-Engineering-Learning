@@ -28,11 +28,13 @@ Guided session finished on 2026-11-15. Reading was reported complete; process/th
 
 ## Day 3: CPU and scheduling
 
-- [ ] **Understand:** User/system time; per-core usage; run queues; context switches; multicore behaviour; load average.
-- [ ] **Read:** CPUs; use the reading map to select a short section.
-- [ ] **Practise:** Run a bounded CPU workload; compare top, mpstat, vmstat and pidstat before/during/after.
-- [ ] **Demonstrate:** Distinguish high utilisation from saturation and interpret load relative to CPU count.
-- [ ] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
+- [x] **Understand:** User/system time; per-core usage; run queues; context switches; multicore behaviour; load average.
+- [x] **Read:** CPUs; use the reading map to select a short section.
+- [x] **Practise:** Run a bounded CPU workload; compare mpstat, vmstat and pidstat before/during/after (top is an optional alternative).
+- [x] **Demonstrate:** Distinguish high utilisation from saturation and interpret load relative to CPU count.
+- [x] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
+
+Guided session completed on 2026-11-16, including a user-space CPU flame graph. Scores: 1/1/1; independent troubleshooting, contention context-switch measurements and final process cleanup remain unverified. See [the evidence and handoff](05-PROGRESS-TRACKER.md).
 
 **AI prompt:** “Start Day 3: CPU and scheduling. Follow the tutor contract, check my prerequisites, and guide one exercise at a time. Assess whether I can distinguish high utilisation from saturation and interpret load relative to CPU count.”
 
