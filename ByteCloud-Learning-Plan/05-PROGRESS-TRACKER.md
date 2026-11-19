@@ -147,6 +147,22 @@ Day 3 guided practicals are complete. Start Day 4 in the same Kali VM. Keep the 
 
 Start Day 5 in the same Kali VM. Keep technical practicals central, with brief theory and explicit explanations of command purpose. The learner explicitly wants to propose their own investigation method before tutor feedback. Label mock data and observed output separately. Reading references should come from the verified PDF contents. Preserve unresolved checks rather than implying that mock fault counts or PSI/OOM evidence were measured.
 
+## Day 5 — 2026-11-19 (in progress)
+
+- Status: theory reading reported complete; analysis and observability reading deferred to the next session. Day remains incomplete and scores remain unassessed.
+- Time spent: not recorded.
+- Reading completed by learner report: assigned theory from Chapter 8 File Systems and Chapter 9 Disks: 8.3.1 File System Latency (p. 327), 8.3.2 Caching (p. 327), 8.3.3 Random versus Sequential I/O (p. 328), 8.3.6 Write-Back Caching (p. 330), 8.3.7 Synchronous Writes (p. 331), 8.3.8 Raw and Direct I/O (p. 331), 8.3.11 Metadata (p. 333), 8.3.16 Capacity (p. 337), 9.3.6 I/O Size (p. 403), 9.3.7 IOPS Are Not Equal (p. 404), 9.3.9 Utilization (p. 404), and 9.3.10 Saturation (p. 405). References were previously checked against the PDF contents; comprehension has not been assessed.
+- Pending reading: 9.6.1 iostat (p. 432). Introduce df, du and lsblk with explanations during the practical.
+- Practical evidence: none collected for Day 5; no workload or filesystem changes made for this session.
+- Cleanup: no new Day 5 workload to clean up. Earlier unverified cleanup remains recorded in preceding entries.
+- Next action: finish observability reading, then investigate a mock backend that cannot create files despite apparent free space. Ask the learner to propose hypotheses, commands and discriminating results before providing suggestions. Do not reveal the cause upfront.
+- Explanation / evidence / investigation scores: not assessed.
+- Review date: set after the practical and assessment.
+
+### Handoff
+
+Resume Day 5, not Day 6. Theory reading is complete by learner report; analysis/observability and all practicals are pending. Start with 9.6.1 iostat, then the learner-led file-creation investigation in Kali. Preserve the distinction between reading completion and demonstrated understanding.
+
 ## Session entry template
 Copy once per session. Schedule recall roughly 1, 3 and 7 study days later; shorten review if recall is strong.
 

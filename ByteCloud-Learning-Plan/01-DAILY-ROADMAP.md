@@ -53,10 +53,12 @@ Guided session completed on 2026-11-19 (scores 1/1/1). Allocation/residency/rele
 ## Day 5: Filesystems and storage
 
 - [ ] **Understand:** Inodes; filesystem capacity; IOPS; throughput; latency; buffered/direct I/O.
-- [ ] **Read:** File systems and disks; use the reading map to select a short section.
+- [ ] **Read:** Theory sections reported complete on 2026-11-19; analysis/observability reading remains pending, starting with 9.6.1 iostat (p. 432).
 - [ ] **Practise:** Inspect df -h, df -i, du, lsblk and iostat while making a small temporary file.
 - [ ] **Demonstrate:** Distinguish capacity, inode exhaustion and I/O performance problems.
 - [ ] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
+
+In progress: theory reading only. No practical or understanding assessment has been completed. Next session: observability reading, then a learner-proposed investigation. See [the handoff](05-PROGRESS-TRACKER.md).
 
 **AI prompt:** “Start Day 5: Filesystems and storage. Follow the tutor contract, check my prerequisites, and guide one exercise at a time. Assess whether I can distinguish capacity, inode exhaustion and I/O performance problems.”
 
