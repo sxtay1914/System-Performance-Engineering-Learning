@@ -50,3 +50,9 @@ Read first: 6.2.3 CPU Run Queues (p. 192); 6.3.6 Utilization (p. 195); 6.3.7 Use
 Use during practicals: 6.6.1 uptime (p. 224); 6.6.2 vmstat (p. 226); 6.6.3 mpstat (p. 227); 6.6.6 top (p. 231); 6.6.8 pidstat (p. 234).
 
 Scheduling refresher: 3.2.9 Schedulers (p. 98). Optional depth: 6.4.2 Software (p. 209); its internal subheadings are not listed in the contents. Defer advanced hardware architecture and tuning.
+
+## Verified Day 4 reading: Chapter 7 — Memory (p. 265)
+
+Read first: 7.2.1 Virtual Memory (p. 267); 7.2.2 Paging (p. 268); 7.2.3 Demand Paging (p. 269); 7.2.4 Overcommit (p. 270); 7.2.5 Swapping (p. 271); 7.2.6 File System Cache Usage (p. 271); 7.2.7 Utilization and Saturation (p. 271); 7.3.3 Process Address Space (p. 284).
+
+Use during practicals: 7.5.1 vmstat (p. 295); 7.5.5 ps (p. 304); 7.5.6 top (p. 305); 7.5.8 pmap (p. 306); 8.6.7 free (p. 376). OOM is not separately indexed in the supplied contents; supplement with kernel documentation and permitted logs. Defer detailed architecture and tuning.

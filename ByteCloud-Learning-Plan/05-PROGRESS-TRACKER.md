@@ -8,7 +8,7 @@ Mark a day complete when you can explain its concept, perform the exercise and i
 | 1 | Performance methodology | 1 | 1 | 0 | [x] | Study Days 2, 4, 8 |
 | 2 | Linux execution model | 1 | 1 | 1 | [ ] | Study Days 3, 5, 9 |
 | 3 | CPU and scheduling | 1 | 1 | 1 | [x] | Study Days 4, 6, 10 |
-| 4 | Memory | — | — | — | [ ] | — |
+| 4 | Memory | 1 | 1 | 1 | [x] | Study Days 5, 7, 11 |
 | 5 | Filesystems and storage | — | — | — | [ ] | — |
 | 6 | Linux investigation practice | — | — | — | [ ] | — |
 | 7 | Linux checkpoint | — | — | — | [ ] | — |
@@ -117,6 +117,35 @@ Continue with Day 3. Use practice-led tutoring: short theory, explain each comma
 ### Handoff
 
 Day 3 guided practicals are complete. Start Day 4 in the same Kali VM. Keep the practice-led format: explain the technical purpose and command syntax, predict, measure, interpret. The learner needs commands that are easy to type and may use the VMware shared project folder to transfer longer source files. Preserve the Day 2 signal gap and Day 3 independent-investigation gaps; do not imply a measured optimisation or fully resolved call stacks.
+
+## Day 4 — 2026-11-17 to 2026-11-19
+
+- Status: guided learning and assessment completed. Reading was assigned November 17, reported complete November 18; supplied practical evidence is from November 19. Time spent not recorded.
+- Environment: same Kali ARM64 VM, two CPUs; 5.8 GiB RAM and 1.0 GiB swap. Python mmap, ps, pmap, pidstat, free and vmstat available.
+- Reading: learner reported finishing the assigned memory sections; exact references are recorded in the reading map.
+- Prediction: learner correctly predicted that reserving anonymous virtual memory need not immediately increase RSS because of lazy allocation/demand paging.
+- Measured evidence supplied by the learner:
+  - `free -h`: 5.8 GiB total, 1.1 GiB used, 2.9 GiB free, 2.0 GiB buff/cache, 4.7 GiB available; swap used 0 B. Interval `vmstat 1 5` reports showed `r=0`, `b=0`, `si=so=0`, `id=98`, `wa=st=0`. No obvious pressure in this window.
+  - Python PID 1178157, `ps -p 1178157 -o pid,vsz,rss,comm`: baseline VSZ/RSS 23,840/17,192 KiB; after reserving a private anonymous 100 MiB mmap, 126,240/17,192; after writing one byte per page, 126,240/119,596; after closing the mapping, 23,840/17,196. This demonstrated reservation, residency and release. An initially unchanged result after the close instruction was followed up before release was confirmed.
+  - RSS-sorted process listing identified `glycin-heif` PID 490742 at 201,512 KiB RSS and 598,528 KiB VSZ. Being the largest consumer did not establish a fault.
+  - `pmap -x 490742`: totals 598,528 KiB mapped, 201,512 KiB RSS, 193,236 KiB dirty. Three anonymous writable regions had RSS 63,884, 55,752 and 60,976 KiB (180,612 KiB combined). Several no-access anonymous reservations had zero RSS. Dirty does not mean erroneous; the allocations' application-level purposes were not identified.
+  - `pidstat -r -p 490742 2 5`: RSS stayed at 201,272 KiB, VSZ at 598,528 KiB, and both minor/major fault rates were 0.00. This showed short-term stability, not that all virtual memory was resident or that no leak exists. Workload activity during sampling was not established.
+  - Learner reported `/proc/sys/vm/overcommit_memory` as 0: heuristic commitment checks, not a guarantee of future physical backing.
+- Mock exercises, not measurements:
+  - Learner requested mock first-touch fault counts because copying commands into Kali was difficult. Assumed 100 MiB, 4 KiB pages, no huge pages: reservation 0 faults, first writes 25,600 minor/0 major, repeated writes 0 additional faults. Actual fault deltas were not collected.
+  - Low available memory, sustained swap traffic and higher latency supported a pressure hypothesis; old swap occupancy alone was insufficient. Learner chose to identify memory consumers before adding RAM.
+  - Final incident: backend latency doubled, RSS rose from 300 MiB to 1.5 GiB, available memory fell, swap traffic stayed zero. Learner proposed ps then pmap, and selected saturation checks to distinguish growth from pressure. Tutor introduced memory PSI; learner explained stalls despite zero swap traffic. Correlation and application-specific evidence are still needed to attribute latency.
+- Concepts corrected/reinforced: free versus available; VSZ versus RSS; minor faults do not require storage reads, major faults do; file-backed faults can be minor; CPU cache misses are distinct from page faults; Linux swapping operates on pages rather than requiring whole-process eviction; clean file pages can be discarded without writeback; anonymous data generally needs swap to be reclaimed while preserved; larger pages improve potential TLB coverage rather than guaranteeing data-cache hit rates.
+- USE method: free/vmstat for occupancy, ps/pmap for attribution, vmstat swap traffic and PSI for saturation, kernel/application logs for OOM and allocation errors. Standard vmstat has no total or available RAM column. OOM selection is not inherently based on application importance; exit 137 alone is not proof of OOM. Kernel-log commands were discussed but not run in supplied evidence.
+- Explanation / evidence / investigation scores: **1 / 1 / 1** (guided). No independent memory incident was diagnosed or repaired.
+- Cleanup: release of the measured 100 MiB mapping was verified through VSZ/RSS. Whether another mapping was created during the skipped fault exercise and whether the Python session finally exited remain unconfirmed; `exit()` was recommended.
+- Remaining gaps: actual first-touch fault counts, PSI output, kernel OOM/allocation logs, real pressure/reclaim stalls and final Python cleanup. Deliberate exhaustion was avoided. Day 2 signal comparison remains pending.
+- Next action: Day 5 filesystems and storage, starting with selective reading. For investigations, present symptom/context first and ask the learner for hypotheses, checks and expected discriminating results before suggesting improvements or commands.
+- Review: study Days 5, 7 and 11; revisit occupancy versus pressure, file-cache versus anonymous paging, and process-specific attribution of system-wide stalls.
+
+### Handoff
+
+Start Day 5 in the same Kali VM. Keep technical practicals central, with brief theory and explicit explanations of command purpose. The learner explicitly wants to propose their own investigation method before tutor feedback. Label mock data and observed output separately. Reading references should come from the verified PDF contents. Preserve unresolved checks rather than implying that mock fault counts or PSI/OOM evidence were measured.
 
 ## Session entry template
 Copy once per session. Schedule recall roughly 1, 3 and 7 study days later; shorten review if recall is strong.

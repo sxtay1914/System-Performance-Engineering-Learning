@@ -40,11 +40,13 @@ Guided session completed on 2026-11-16, including a user-space CPU flame graph. 
 
 ## Day 4: Memory
 
-- [ ] **Understand:** Virtual versus resident memory; paging; minor/major faults; cache; swapping; leaks; OOM.
-- [ ] **Read:** Memory; use the reading map to select a short section.
+- [x] **Understand:** Virtual versus resident memory; paging; minor/major faults; cache; swapping; leaks; OOM.
+- [x] **Read:** Memory; use the reading map to select a short section.
 - [ ] **Practise:** Observe free -h, vmstat and pmap on a bounded allocation workload; inspect permitted kernel logs.
-- [ ] **Demonstrate:** Explain why low free memory alone is insufficient evidence of pressure.
-- [ ] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
+- [x] **Demonstrate:** Explain why low free memory alone is insufficient evidence of pressure.
+- [x] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
+
+Guided session completed on 2026-11-19 (scores 1/1/1). Allocation/residency/release and process mappings were observed. The practice checkbox remains open for kernel-log inspection; first-touch fault counts used mock data, and PSI, real pressure/OOM and final Python cleanup were not verified. See [the evidence and handoff](05-PROGRESS-TRACKER.md).
 
 **AI prompt:** “Start Day 4: Memory. Follow the tutor contract, check my prerequisites, and guide one exercise at a time. Assess whether I can explain why low free memory alone is insufficient evidence of pressure.”
 
