@@ -9,7 +9,7 @@ Mark a day complete when you can explain its concept, perform the exercise and i
 | 2 | Linux execution model | 1 | 1 | 1 | [ ] | Study Days 3, 5, 9 |
 | 3 | CPU and scheduling | 1 | 1 | 1 | [x] | Study Days 4, 6, 10 |
 | 4 | Memory | 1 | 1 | 1 | [x] | Study Days 5, 7, 11 |
-| 5 | Filesystems and storage | — | — | — | [ ] | — |
+| 5 | Filesystems and storage | 1 | 1 | 1 | [x] | Study Days 6, 8, 12 |
 | 6 | Linux investigation practice | — | — | — | [ ] | — |
 | 7 | Linux checkpoint | — | — | — | [ ] | — |
 | 8 | IP and local delivery | — | — | — | [ ] | — |
@@ -147,21 +147,58 @@ Day 3 guided practicals are complete. Start Day 4 in the same Kali VM. Keep the 
 
 Start Day 5 in the same Kali VM. Keep technical practicals central, with brief theory and explicit explanations of command purpose. The learner explicitly wants to propose their own investigation method before tutor feedback. Label mock data and observed output separately. Reading references should come from the verified PDF contents. Preserve unresolved checks rather than implying that mock fault counts or PSI/OOM evidence were measured.
 
-## Day 5 — 2026-11-19 (in progress)
+## Day 5 — 2026-11-19 to 2026-11-23
 
-- Status: theory reading reported complete; analysis and observability reading deferred to the next session. Day remains incomplete and scores remain unassessed.
-- Time spent: not recorded.
-- Reading completed by learner report: assigned theory from Chapter 8 File Systems and Chapter 9 Disks: 8.3.1 File System Latency (p. 327), 8.3.2 Caching (p. 327), 8.3.3 Random versus Sequential I/O (p. 328), 8.3.6 Write-Back Caching (p. 330), 8.3.7 Synchronous Writes (p. 331), 8.3.8 Raw and Direct I/O (p. 331), 8.3.11 Metadata (p. 333), 8.3.16 Capacity (p. 337), 9.3.6 I/O Size (p. 403), 9.3.7 IOPS Are Not Equal (p. 404), 9.3.9 Utilization (p. 404), and 9.3.10 Saturation (p. 405). References were previously checked against the PDF contents; comprehension has not been assessed.
-- Pending reading: 9.6.1 iostat (p. 432). Introduce df, du and lsblk with explanations during the practical.
-- Practical evidence: none collected for Day 5; no workload or filesystem changes made for this session.
-- Cleanup: no new Day 5 workload to clean up. Earlier unverified cleanup remains recorded in preceding entries.
-- Next action: finish observability reading, then investigate a mock backend that cannot create files despite apparent free space. Ask the learner to propose hypotheses, commands and discriminating results before providing suggestions. Do not reveal the cause upfront.
-- Explanation / evidence / investigation scores: not assessed.
-- Review date: set after the practical and assessment.
+- Status: guided session closed at learner request; original practicals substantially covered, with remaining checks and expanded exercises deferred to the backlog below. Completion denotes guided work, not independent mastery or completion of every added benchmark.
+- Time spent: not recorded. Learner requested a quick pace and ultimately concise conceptual answers instead of completing the cache benchmark.
+- Environment: Kali ARM64 VM, kernel 6.19.14+kali-arm64, two CPUs, ext4 on /dev/nvme0n1p3 mounted at /. bpftrace and BCC cachestat-bpfcc were present.
+- Reading: assigned filesystem/disk theory reported complete November 19; entire filesystem chapter reported complete November 23. Completion of 9.6.1 iostat (p. 432) reading was not explicitly confirmed, although the tool was used and interpreted.
+- Capacity/access investigation (real checks for a mock failure):
+  - `df -h .`: 18 GiB filesystem, 14 GiB used, 3.2 GiB available, 81% used. `df -i .`: 1,179,648 inodes, 481,802 used, 697,846 free (41% used). Neither resource was exhausted.
+  - `ls -ld .` showed home owned by jesmond with `drwx------`; `id` confirmed UID/GID 1000 jesmond. Owner write/search permission applied. Service identity could differ.
+  - `quota -s` returned no output: no user quota reported, not proof that all quota mechanisms were disabled.
+  - `findmnt` showed `rw,relatime,errors=remount-ro`: currently writable; remount-ro is error policy, not evidence of a present error.
+  - `mktemp ./day5-test.XXXXXX` created `./day5-test.aHBeGg`; `ls -l "$test_file"` confirmed a zero-byte file with owner read/write access. `rm -- "$test_file"` reported no error. Corrected literal variable name versus `$test_file` expansion.
+- Storage observations:
+  - Initial `iostat -xz -y 1 5` had no device rows: inactive devices were hidden by -z.
+  - Following the instructed 64 MiB dd write with final fdatasync, supplied nvme0n1 interval showed w/s=68, wkB/s=65,604, w_await=3.29 ms, wareq-sz=964.76 KiB, aqu-sz=0.22, util=1.20%. No sustained saturation established; device statistics differ from application operations. The requested dd completion summary was not supplied.
+- Tracing evidence:
+  - Listed sys_enter_openat fields (dfd, filename, flags, mode and dynamic filename field) and sys_exit_write ret field. Explained entry versus exit, VFS versus syscall boundary, and tracing requested operations versus actual device I/O.
+  - bpftrace paired write/fdatasync entries and exits using tid and nsecs, filtered entries by comm == dd, and produced separate microsecond histograms. Initial write histogram contained about 4.43 million calls and had uncertain workload attribution; it was not used as the intended bounded-run result.
+  - Subsequent supplied histogram: 59 writes in [64,128) us, four in [128,256), one in [256,512), plus three shorter calls ([0], [1], [8,16)). One fdatasync in [4096,8192) us. Consistent with the intended data-write count plus possible reporting writes, but not proven from PID/return-value evidence.
+  - Per-thread completion-based duration map reported TID 1990616: 17,825,533 ns = 17.83 ms, or 1.78% of a nominal second. This includes execution/wait time, not CPU utilisation. Calls were assigned to their completion bucket, not split across interval boundaries; asynchronous print/clear can also affect interval accuracy. Selected syscalls only, not exact full-filesystem occupancy.
+- Cache observations and deferred work:
+  - `free -h`: 5.8 GiB total, 1.1 GiB used, 2.2 GiB free, 2.6 GiB buff/cache, 4.6 GiB available; swap used 16 KiB. Cache occupancy is not a hit ratio or maximum cache capacity.
+  - cachestat-bpfcc failed to compile because running-kernel headers/kheaders were missing; APT initially could not locate linux-headers-6.19.14+kali-arm64. Update/download was reported in progress; successful installation or tracing was not confirmed.
+  - Later df: 18 GiB total, 15 GiB used, 2.1 GiB available (88% used). Proposed 128 MiB test to avoid filling storage; creation summary not supplied. Learner skipped cold/warm read measurement. No cache-capacity threshold or degradation result was measured.
+  - Provided conceptual cache checklist: page-cache counters in free/meminfo, dentry/inode allocation and active objects via slabtop, estimated page-cache hit rates via BCC cachestat/cachetop, dentry stats via dcstat; inode hit rate needs targeted instrumentation. No metadata-cache size or hit-rate output was supplied.
+  - Provided workload checklist: operation mix/rates, request sizes and returns, per-process/device traffic, offsets for sequential/random patterns, latency distributions, per-thread elapsed time, open flags and sync policy. iostat alone cannot establish application access patterns.
+- Concepts covered: logical/physical I/O inflation and deflation; cache versus storage throughput; direct I/O bypasses page cache rather than VFS; raw device access is distinct; read prefetch versus write buffering; fsync batching versus O_SYNC; mmap mapping/copying benefits and limitations; working-set size versus RSS; cache hit/miss interpretation. A cache benchmark procedure was explained, not executed.
+- Explanation / evidence / investigation scores: **1 / 1 / 1** (guided). Learner proposed capacity, permissions and quota checks; needed help choosing performance metrics and writing traces. No independent incident cause/recovery was established.
+- Cleanup: empty-file creation test cleanup reported no error. Later dd files, possible 128 MiB cache file and tracing-session cleanup were not explicitly confirmed. Do not delete by broad glob or reuse historical PIDs without verifying ownership and identity.
+- Next action: Day 6 Linux investigation practice. Brief recall, then Lab A with learner-proposed hypotheses/checks before tutor suggestions. Check available time, current VM resources and leftover lab artifacts first. Do not expose the incident cause upfront.
+- Review: study Days 6, 8 and 12. Revisit syscall versus device latency, utilisation versus saturation, and observed results versus hypothetical benchmark behaviour.
 
 ### Handoff
 
-Resume Day 5, not Day 6. Theory reading is complete by learner report; analysis/observability and all practicals are pending. Start with 9.6.1 iostat, then the learner-led file-creation investigation in Kali. Preserve the distinction between reading completion and demonstrated understanding.
+Proceed to Day 6. Day 5 guided session is closed, with the expanded benchmark work explicitly deferred. Keep tasks concise and ask the learner for a method before giving commands. Preserve measured results, uncertainty and skipped work separately. No cache-capacity number, degradation measurement or successful hit-rate trace exists. Consult the backlog before resuming extras.
+
+## Deferred-work backlog
+
+These items remain open; they do not block starting Day 6. Priorities indicate follow-up order, not permission to run workloads or change kernel settings without checking the current environment.
+
+| Priority | Item | Current evidence / limit | Next bounded action |
+|---|---|---|---|
+| High | Confirm lab cleanup | Day 5 empty-file test removed; later dd/cache files and earlier Python/signal workloads unconfirmed | Inspect current jobs/process identities and specific lab files; remove only confirmed disposable artifacts |
+| Medium | Day 5 cache hit-rate measurement | BCC compilation failed for missing exact kernel headers; download outcome unknown | Check installation and compatibility; sample under a bounded workload if supported; avoid an unnecessary kernel rebuild |
+| Medium | Cache sizes/usage checklist validation | Conceptual checklist delivered; only aggregate free output collected | Inspect meminfo and slabtop for page/dentry/inode cache data; distinguish allocated objects from useful cache hits |
+| Medium | Effective cache-capacity benchmark and degradation | Not performed; cold/warm precursor skipped; only 2.1 GiB disk free versus earlier 4.6 GiB available RAM | Plan a safely isolated/constrained cache budget or adequate separate storage, then vary working set with buffered I/O and report measured throughput/latency/device reads; do not fill root filesystem |
+| Medium | Exact per-thread filesystem occupancy and stronger latency attribution | Histograms for write/fdatasync only; approximate completion buckets and comm filter | Target an identified process, account for return values and relevant operations, split calls at interval boundaries and use reliable snapshot accounting |
+| Medium | Day 5 core tool/reading gaps | du/lsblk not exercised; iostat reading completion unconfirmed | Briefly inspect directory usage/device-to-filesystem mapping and confirm selective reading when useful in Day 6 |
+| Medium | Day 2 signals | SIGINT status reported; SIGTERM handler/SIGKILL comparison unverified | Repeat on an identified disposable process, verify exit and cleanup |
+| Low | Day 3 contention scheduling | CPU saturation demonstrated; involuntary switches and per-thread scheduling wait not measured | Short bounded contention run with per-thread scheduling metrics |
+| Low | Day 4 faults/pressure/logs | First-touch counts mocked; PSI and OOM/allocation logs not collected | Measure bounded first-touch faults, read PSI and permitted existing logs; do not force host-wide exhaustion |
+| Low | Independent investigation / Day 1 reading | Prior scores remain guided; Day 1 methodology reading unconfirmed | Use Day 6 to assess independent reasoning and revisit relevant methodology sections |
 
 ## Session entry template
 Copy once per session. Schedule recall roughly 1, 3 and 7 study days later; shorten review if recall is strong.

@@ -52,13 +52,13 @@ Guided session completed on 2026-11-19 (scores 1/1/1). Allocation/residency/rele
 
 ## Day 5: Filesystems and storage
 
-- [ ] **Understand:** Inodes; filesystem capacity; IOPS; throughput; latency; buffered/direct I/O.
-- [ ] **Read:** Theory sections reported complete on 2026-11-19; analysis/observability reading remains pending, starting with 9.6.1 iostat (p. 432).
-- [ ] **Practise:** Inspect df -h, df -i, du, lsblk and iostat while making a small temporary file.
-- [ ] **Demonstrate:** Distinguish capacity, inode exhaustion and I/O performance problems.
-- [ ] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
+- [x] **Understand:** Inodes; filesystem capacity; IOPS; throughput; latency; buffered/direct I/O.
+- [ ] **Read:** Entire filesystem chapter reported complete on 2026-11-23; assigned disk theory previously reported complete. Explicit confirmation of 9.6.1 iostat (p. 432) reading remains pending.
+- [ ] **Practise:** df -h, df -i, iostat, access checks, temporary-file creation and bounded write tracing performed; du and lsblk remain deferred.
+- [x] **Demonstrate:** Distinguish capacity, inode exhaustion and I/O performance problems.
+- [x] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
 
-In progress: theory reading only. No practical or understanding assessment has been completed. Next session: observability reading, then a learner-proposed investigation. See [the handoff](05-PROGRESS-TRACKER.md).
+Guided session closed on 2026-11-23 (scores 1/1/1); proceed to Day 6. Selected-syscall histograms and approximate per-thread time were measured. Added cache hit-rate/capacity benchmarks remain unperformed; remaining core checks and cleanup are in [the backlog and handoff](05-PROGRESS-TRACKER.md#deferred-work-backlog). Open checklist items are intentionally preserved.
 
 **AI prompt:** “Start Day 5: Filesystems and storage. Follow the tutor contract, check my prerequisites, and guide one exercise at a time. Assess whether I can distinguish capacity, inode exhaustion and I/O performance problems.”
 
