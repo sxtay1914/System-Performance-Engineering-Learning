@@ -65,10 +65,12 @@ Guided session closed on 2026-11-23 (scores 1/1/1); proceed to Day 6. Selected-s
 ## Day 6: Linux investigation practice
 
 - [ ] **Understand:** Baselines; interval sampling; USE across CPU/memory/storage; observation versus inference.
-- [ ] **Read:** Methodology revisit; use the reading map to select a short section.
+- [x] **Read:** Methodology revisit; use the reading map to select a short section.
 - [ ] **Practise:** Complete Lab A without receiving the cause up front.
 - [ ] **Demonstrate:** Support a diagnosis with two observations and one alternative explanation.
 - [ ] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
+
+In progress as of 2026-11-24. Reading, HTTP/resource baselines and a disclosed CPU-contention experiment are recorded; consistent application slowdown was not demonstrated. Resume the mock database-lock investigation at the Session B question in [the handoff](05-PROGRESS-TRACKER.md). Final assessment, recovery/cleanup verification and independent Lab A completion remain pending.
 
 **AI prompt:** “Start Day 6: Linux investigation practice. Follow the tutor contract, check my prerequisites, and guide one exercise at a time. Assess whether I can support a diagnosis with two observations and one alternative explanation.”
 

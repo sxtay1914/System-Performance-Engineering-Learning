@@ -183,13 +183,42 @@ Start Day 5 in the same Kali VM. Keep technical practicals central, with brief t
 
 Proceed to Day 6. Day 5 guided session is closed, with the expanded benchmark work explicitly deferred. Keep tasks concise and ask the learner for a method before giving commands. Preserve measured results, uncertainty and skipped work separately. No cache-capacity number, degradation measurement or successful hit-rate trace exists. Consult the backlog before resuming extras.
 
+## Day 6 — 2026-11-24 (in progress)
+
+- Status: learner stopped at a saved checkpoint to do other work. Day remains incomplete; final scores and review dates are not yet assigned. Rough scope estimate given in conversation was 70%, not a mastery score.
+- Reading: learner reported completing the refresher: 2.5.5 Problem Statement (p. 39), 2.5.6 Scientific Method (p. 39), 2.5.9 The USE Method (p. 42).
+- Environment: same Kali ARM64 VM with two CPUs. Initial capacity: 5.8 GiB RAM, 4.6 GiB available; root filesystem 18 GiB total, 14 GiB used, 3.2 GiB available (81%). Time budget not supplied.
+- Method: learner proposed defining what the request does, obtaining a normal-latency baseline, then applying USE. Chose vmstat and free for resource observations with guidance on available memory, swap traffic and CPU queueing.
+- Application setup: tiny index.html served by Python's HTTP server on 127.0.0.1:8000 from `/home/jesmond/day6-lab.wrmbQY`, with a 300-second timeout. Supplied process listing identified timeout PID 2297788 and Python PID 2297789. These are historical identities, not safe targets to signal without rechecking.
+- Actual measurements:
+  - Five sequential curl requests returned HTTP 200 with total times 0.001123, 0.001506, 0.001436, 0.001136 and 0.001138 seconds. Range 1.12–1.51 ms; median 1.138 ms, mean 1.2678 ms. Corrected URL/line-continuation typing errors before collecting this valid baseline.
+  - Resource baseline: free showed 4.6 GiB available and 16 KiB swap occupied; vmstat interval samples showed r=0–1, b=0, si=so=0, 97–98% idle, and occasional small block writes. Occupied swap did not establish active swapping.
+  - Controlled workload: four busy bash loops, each bounded by timeout -s KILL 30s. Workload type was disclosed, so this was not an unknown-cause investigation. A mistyped loop was corrected before successful measurements.
+  - During workload, vmstat interval samples showed r=4–5, id=0, us=99–100, sy=0–1, b=0 and si=so=0. This supports CPU saturation on two CPUs.
+  - Subsequent five curl results were all 200: 0.002439, 0.001654, 0.000965, 0.000780 and 0.000767 seconds. Range 0.77–2.44 ms; median 0.965 ms. First two were slower but later requests were faster than baseline. Overlap with the full workload interval was not confirmed; learner chose to move on. No consistent HTTP slowdown or recovery was demonstrated, and five samples cannot establish p95/tail behaviour.
+- Mock investigation (all subsequent service/database evidence was synthetic):
+  - Scenario: p95 rose from 20 to 400 ms at unchanged request rate, with 35% aggregate CPU, 3 GiB available RAM and zero swap traffic. Learner proposed disk/network checks; tutor explained that aggregate CPU and zero swap do not fully clear CPU/thread constraints or memory stalls.
+  - Suggested checks: storage iowait/iostat and dependency curl timing. Given unchanged device write latency (2 ms), outstanding requests (0.1) and dependency connect time (1 ms), but time-to-first-byte increasing from 15 to 380 ms, learner initially called this an I/O problem. Clarified dependency-response delay versus proven local storage/network fault.
+  - Explained request-log correlation using timestamps, endpoint/status, request/trace IDs, total/dependency durations and retries. No actual logs were inspected.
+  - Correlated mock request abc: backend total 405 ms, inventory call 382 ms; inventory total 379 ms, DB pool wait 340 ms, query time 18 ms. Learner correctly located pool wait and proposed checking queue size and pool threads; corrected pool resource to database connections.
+  - Learner correctly rejected blindly increasing pool capacity and proposed investigating locks or other causes of long connection holds. Low CPU was suggested as lock evidence; clarified it only indicates possible waiting. Direct evidence requires lock wait and blocker relationships.
+  - Current mock evidence: Session A is waiting for a row lock held by Session B; B has been idle in transaction with a transaction open for 90 seconds. No resolution has been chosen or executed.
+- Cleanup: server and workers were time-bounded, but actual final process status and removal of index.html/lab directory were not confirmed. Do not reuse historical PIDs or delete unrelated files. Verify the identified lab artifacts on resume.
+- Assessment: guided reasoning observed; final explanation/evidence/investigation scores remain pending. Full Lab A and an independent unfamiliar Linux diagnosis remain incomplete. No additional memory/storage workload was run during this session.
+- Exact resume question: **What would you investigate about Session B before deciding how to resolve the blocking transaction?** Let the learner propose the method first. Then discuss a justified resolution, recovery evidence and prevention without treating hypothetical actions as performed.
+- Next actions: finish the mock diagnosis, require two supporting observations and an alternative, explain recovery verification/prevention, confirm lab cleanup, and record final assessment. Decide how to complete the remaining Lab A/independent evidence rather than silently marking it done.
+
+### Handoff
+
+Resume Day 6 at the Session B question above; do not restart Days 1–5 or repeat the baseline by default. Keep responses concise, ask for the learner's method before suggesting commands, and distinguish real CPU/HTTP observations from synthetic dependency/database evidence. The CPU experiment showed saturation without a demonstrated sustained HTTP slowdown. Day 6 is not complete.
+
 ## Deferred-work backlog
 
-These items remain open; they do not block starting Day 6. Priorities indicate follow-up order, not permission to run workloads or change kernel settings without checking the current environment.
+These items remain open; they do not block continuing Day 6. Priorities indicate follow-up order, not permission to run workloads or change kernel settings without checking the current environment.
 
 | Priority | Item | Current evidence / limit | Next bounded action |
 |---|---|---|---|
-| High | Confirm lab cleanup | Day 5 empty-file test removed; later dd/cache files and earlier Python/signal workloads unconfirmed | Inspect current jobs/process identities and specific lab files; remove only confirmed disposable artifacts |
+| High | Confirm lab cleanup | Day 6 HTTP server/workers and lab directory unconfirmed; Day 5 empty-file test removed, later dd/cache files and earlier Python/signal workloads unconfirmed | Inspect current jobs/process identities and specific lab files; remove only confirmed disposable artifacts |
 | Medium | Day 5 cache hit-rate measurement | BCC compilation failed for missing exact kernel headers; download outcome unknown | Check installation and compatibility; sample under a bounded workload if supported; avoid an unnecessary kernel rebuild |
 | Medium | Cache sizes/usage checklist validation | Conceptual checklist delivered; only aggregate free output collected | Inspect meminfo and slabtop for page/dentry/inode cache data; distinguish allocated objects from useful cache hits |
 | Medium | Effective cache-capacity benchmark and degradation | Not performed; cold/warm precursor skipped; only 2.1 GiB disk free versus earlier 4.6 GiB available RAM | Plan a safely isolated/constrained cache budget or adequate separate storage, then vary working set with buffered I/O and report measured throughput/latency/device reads; do not fill root filesystem |
