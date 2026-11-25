@@ -64,13 +64,13 @@ Guided session closed on 2026-11-23 (scores 1/1/1); proceed to Day 6. Selected-s
 
 ## Day 6: Linux investigation practice
 
-- [ ] **Understand:** Baselines; interval sampling; USE across CPU/memory/storage; observation versus inference.
+- [x] **Understand:** Baselines; interval sampling; USE across CPU/memory/storage; observation versus inference.
 - [x] **Read:** Methodology revisit; use the reading map to select a short section.
 - [ ] **Practise:** Complete Lab A without receiving the cause up front.
-- [ ] **Demonstrate:** Support a diagnosis with two observations and one alternative explanation.
-- [ ] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
+- [x] **Demonstrate:** Support a diagnosis with two observations and one alternative explanation.
+- [x] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
 
-In progress as of 2026-11-24. Reading, HTTP/resource baselines and a disclosed CPU-contention experiment are recorded; consistent application slowdown was not demonstrated. Resume the mock database-lock investigation at the Session B question in [the handoff](05-PROGRESS-TRACKER.md). Final assessment, recovery/cleanup verification and independent Lab A completion remain pending.
+Guided assessment finished on 2026-11-25: explanation/evidence/investigation 1/1/1 (with help). Mock diagnosis, alternative cause and recovery reasoning covered; no actual database repair or consistent HTTP slowdown demonstrated. Continue to Day 7. Independent Lab A evidence and cleanup remain open in [the tracker](05-PROGRESS-TRACKER.md).
 
 **AI prompt:** “Start Day 6: Linux investigation practice. Follow the tutor contract, check my prerequisites, and guide one exercise at a time. Assess whether I can support a diagnosis with two observations and one alternative explanation.”
 
@@ -81,6 +81,8 @@ In progress as of 2026-11-24. Reading, HTTP/resource baselines and a disclosed C
 - [ ] **Practise:** Repeat one unfamiliar Linux incident and write a short incident report.
 - [ ] **Demonstrate:** Identify the affected resource, process, evidence and recovery; review weak areas.
 - [ ] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
+
+Guided `/report` mock investigation and recovery reasoning finished on 2026-11-26, including `pidstat -d` interpretation. Day 7 is still open: the independent Kali lab has not started. Resume by mounting the VMware share and collecting the healthy baseline; see [the Day 7 handoff](05-PROGRESS-TRACKER.md#day-7--2026-11-25-to-2026-11-26-guided-mock-finished).
 
 **AI prompt:** “Start Day 7: Linux checkpoint. Follow the tutor contract, check my prerequisites, and guide one exercise at a time. Assess whether I can identify the affected resource, process, evidence and recovery; review weak areas.”
 

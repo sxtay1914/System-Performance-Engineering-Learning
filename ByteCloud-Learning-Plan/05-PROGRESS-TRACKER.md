@@ -10,7 +10,7 @@ Mark a day complete when you can explain its concept, perform the exercise and i
 | 3 | CPU and scheduling | 1 | 1 | 1 | [x] | Study Days 4, 6, 10 |
 | 4 | Memory | 1 | 1 | 1 | [x] | Study Days 5, 7, 11 |
 | 5 | Filesystems and storage | 1 | 1 | 1 | [x] | Study Days 6, 8, 12 |
-| 6 | Linux investigation practice | — | — | — | [ ] | — |
+| 6 | Linux investigation practice | 1 | 1 | 1 | [ ] | Study Days 7, 9, 13 |
 | 7 | Linux checkpoint | — | — | — | [ ] | — |
 | 8 | IP and local delivery | — | — | — | [ ] | — |
 | 9 | TCP, UDP and sockets | — | — | — | [ ] | — |
@@ -183,9 +183,9 @@ Start Day 5 in the same Kali VM. Keep technical practicals central, with brief t
 
 Proceed to Day 6. Day 5 guided session is closed, with the expanded benchmark work explicitly deferred. Keep tasks concise and ask the learner for a method before giving commands. Preserve measured results, uncertainty and skipped work separately. No cache-capacity number, degradation measurement or successful hit-rate trace exists. Consult the backlog before resuming extras.
 
-## Day 6 — 2026-11-24 (in progress)
+## Day 6 — 2026-11-24 to 2026-11-25 (guided assessment finished)
 
-- Status: learner stopped at a saved checkpoint to do other work. Day remains incomplete; final scores and review dates are not yet assigned. Rough scope estimate given in conversation was 70%, not a mastery score.
+- Status: resumed November 25 and finished the guided mock incident discussion. Learner chose to proceed to Day 7. Full completion remains open for independent Lab A evidence and cleanup; guided scores are 1/1/1. Prior percentage estimates described scope, not mastery.
 - Reading: learner reported completing the refresher: 2.5.5 Problem Statement (p. 39), 2.5.6 Scientific Method (p. 39), 2.5.9 The USE Method (p. 42).
 - Environment: same Kali ARM64 VM with two CPUs. Initial capacity: 5.8 GiB RAM, 4.6 GiB available; root filesystem 18 GiB total, 14 GiB used, 3.2 GiB available (81%). Time budget not supplied.
 - Method: learner proposed defining what the request does, obtaining a normal-latency baseline, then applying USE. Chose vmstat and free for resource observations with guidance on available memory, swap traffic and CPU queueing.
@@ -204,21 +204,38 @@ Proceed to Day 6. Day 5 guided session is closed, with the expanded benchmark wo
   - Learner correctly rejected blindly increasing pool capacity and proposed investigating locks or other causes of long connection holds. Low CPU was suggested as lock evidence; clarified it only indicates possible waiting. Direct evidence requires lock wait and blocker relationships.
   - Current mock evidence: Session A is waiting for a row lock held by Session B; B has been idle in transaction with a transaction open for 90 seconds. No resolution has been chosen or executed.
 - Cleanup: server and workers were time-bounded, but actual final process status and removal of index.html/lab directory were not confirmed. Do not reuse historical PIDs or delete unrelated files. Verify the identified lab artifacts on resume.
-- Assessment: guided reasoning observed; final explanation/evidence/investigation scores remain pending. Full Lab A and an independent unfamiliar Linux diagnosis remain incomplete. No additional memory/storage workload was run during this session.
-- Exact resume question: **What would you investigate about Session B before deciding how to resolve the blocking transaction?** Let the learner propose the method first. Then discuss a justified resolution, recovery evidence and prevention without treating hypothetical actions as performed.
-- Next actions: finish the mock diagnosis, require two supporting observations and an alternative, explain recovery verification/prevention, confirm lab cleanup, and record final assessment. Decide how to complete the remaining Lab A/independent evidence rather than silently marking it done.
+- November 25 continuation (mock evidence only): learner proposed examining why B was idle and what operation it was doing. Tutor supplied application sequence: BEGIN, inventory UPDATE completed in 8 ms, external payment call waiting for 90 seconds, COMMIT not reached. Learner suggested a timeout; tutor explained rollback/connection cleanup and avoiding external waits inside long transactions where correctness permits.
+- Learner recognised that a timed-out payment may have succeeded and proposed idempotency. Discussed stable keys for retries of the same logical payment and querying outcome, separately from releasing database locks.
+- Recovery reasoning: learner proposed remeasuring latency; tutor added comparable load/p95, cleared blocking relationships, pool-wait recovery, errors and duplicate-payment checks. No recovery action was executed or measured.
+- Final explanation: learner identified B waiting on an API while holding a transaction lock and blocking A. Corrected “indefinitely” to the observed 90-second wait. Tutor supplied the two supporting observations (blocking relationship and application sequence); learner independently proposed increased query time as an alternative cause of pool exhaustion.
+- Assessment: **explanation 1 / evidence 1 / investigation 1**, with guidance. Scale clarified: 0 = not demonstrated, 1 = with help, 2 = independently. Full Lab A and an independent unfamiliar Linux diagnosis remain incomplete; no additional memory/storage workload was run.
+- Review: study Days 7, 9 and 13. Revisit waiting versus proven lock contention, alternative causes of pool exhaustion and recovery evidence.
+- Remaining actions: verify lab cleanup and complete independent investigation during Day 7; preserve the missing Lab A evidence rather than treating the mock discussion as a real repair.
 
 ### Handoff
 
-Resume Day 6 at the Session B question above; do not restart Days 1–5 or repeat the baseline by default. Keep responses concise, ask for the learner's method before suggesting commands, and distinguish real CPU/HTTP observations from synthetic dependency/database evidence. The CPU experiment showed saturation without a demonstrated sustained HTTP slowdown. Day 6 is not complete.
+Continue with Day 7 below. Day 6 guided assessment is recorded as 1/1/1, but its completion checkbox remains open for cleanup and independent practical evidence. Do not repeat the Session B discussion. No sustained HTTP slowdown or actual database recovery was demonstrated.
+
+## Day 7 — 2026-11-25 to 2026-11-26 (guided mock finished)
+
+- Status: guided mock diagnosis, recovery test design and incident summary finished. Independent troubleshooting and final scores remain open. No Day 7 reading completion was reported.
+- Mock evidence only: `/report` normally took 100 ms; some requests took 3–5 s. The learner requested a trace and located the delay in Build report. CPU and runnable wait (70 ms and 15 ms) did not explain the 4.118 s build. A mock syscall trace attributed 3.982 s to `fdatasync`. `iostat` showed a growing device queue, and `pidstat` identified a heavy backup writer whose output shared the report's backing device.
+- Mock recovery only: learner proposed throttling the backup worker and comparing latency. Under comparable request load, mock backup writes fell from 80 to 20 MiB/s, average device queue depth from 30 to 0.4, and `/report` p95 from 4.2 s to 120 ms. This supported backup-induced storage contention in the scenario; no real backup was changed.
+- `pidstat -d` practice: learner matched samples to a request, distinguished write activity from `iodelay`, and corrected the assumption that task write accounting and device writeback must occur in the same interval. Review: if the filesystem wait improves but endpoint latency does not, use a fresh request trace to locate the remaining delay instead of rechecking an already confirmed device improvement.
+- Actual Kali preflight: learner confirmed the same two-CPU Kali ARM64 VM and a 20–30 minute budget. `ss` showed no listener on port 8000 at the time checked; the old Day 6 directory and `index.html` still existed and were retained by choice. Other worker cleanup was not verified.
+- Fixture: [day7_checkpoint.py](../labs/day7_checkpoint.py) was smoke-tested outside Kali. The VMware shared folder is configured, but a guest mount was not confirmed. No Day 7 server, latency baseline, or fault measurement was collected in Kali.
+
+### Handoff
+
+Resume by listing VMware shares with `vmware-hgfsclient` and mounting the project share read-only with `vmhgfs-fuse` at a temporary mount point. Start `timeout 10m python3 labs/day7_checkpoint.py` from the shared project directory (or use the mounted script's absolute path). In a second terminal, collect five healthy `curl` status and `time_total` samples at `http://127.0.0.1:8077/report` before activating the scenario. Keep the cause hidden and let the learner choose their checks. Verify recovery while the server is still running, then stop it and confirm cleanup before marking the milestone complete.
 
 ## Deferred-work backlog
 
-These items remain open; they do not block continuing Day 6. Priorities indicate follow-up order, not permission to run workloads or change kernel settings without checking the current environment.
+These items remain open; they do not block starting Day 7. Priorities indicate follow-up order, not permission to run workloads or change kernel settings without checking the current environment.
 
 | Priority | Item | Current evidence / limit | Next bounded action |
 |---|---|---|---|
-| High | Confirm lab cleanup | Day 6 HTTP server/workers and lab directory unconfirmed; Day 5 empty-file test removed, later dd/cache files and earlier Python/signal workloads unconfirmed | Inspect current jobs/process identities and specific lab files; remove only confirmed disposable artifacts |
+| High | Confirm lab cleanup | Day 6 port 8000 had no listener during Day 7 preflight; worker cleanup unverified and the lab directory was retained by choice. Later Day 5 dd/cache files and earlier Python/signal workloads unconfirmed | Verify current process identities and clean up only specifically identified disposable artifacts the learner wants removed |
 | Medium | Day 5 cache hit-rate measurement | BCC compilation failed for missing exact kernel headers; download outcome unknown | Check installation and compatibility; sample under a bounded workload if supported; avoid an unnecessary kernel rebuild |
 | Medium | Cache sizes/usage checklist validation | Conceptual checklist delivered; only aggregate free output collected | Inspect meminfo and slabtop for page/dentry/inode cache data; distinguish allocated objects from useful cache hits |
 | Medium | Effective cache-capacity benchmark and degradation | Not performed; cold/warm precursor skipped; only 2.1 GiB disk free versus earlier 4.6 GiB available RAM | Plan a safely isolated/constrained cache budget or adequate separate storage, then vary working set with buffered I/O and report measured throughput/latency/device reads; do not fill root filesystem |
@@ -227,7 +244,7 @@ These items remain open; they do not block continuing Day 6. Priorities indicate
 | Medium | Day 2 signals | SIGINT status reported; SIGTERM handler/SIGKILL comparison unverified | Repeat on an identified disposable process, verify exit and cleanup |
 | Low | Day 3 contention scheduling | CPU saturation demonstrated; involuntary switches and per-thread scheduling wait not measured | Short bounded contention run with per-thread scheduling metrics |
 | Low | Day 4 faults/pressure/logs | First-touch counts mocked; PSI and OOM/allocation logs not collected | Measure bounded first-touch faults, read PSI and permitted existing logs; do not force host-wide exhaustion |
-| Low | Independent investigation / Day 1 reading | Prior scores remain guided; Day 1 methodology reading unconfirmed | Use Day 6 to assess independent reasoning and revisit relevant methodology sections |
+| Low | Independent investigation / Day 1 reading | Prior scores remain guided; Day 1 methodology reading unconfirmed | Use Day 7 to assess independent reasoning and revisit relevant methodology sections |
 
 ## Session entry template
 Copy once per session. Schedule recall roughly 1, 3 and 7 study days later; shorten review if recall is strong.
