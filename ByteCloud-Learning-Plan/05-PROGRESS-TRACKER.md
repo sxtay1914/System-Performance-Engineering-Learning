@@ -11,8 +11,8 @@ Mark a day complete when you can explain its concept, perform the exercise and i
 | 4 | Memory | 1 | 1 | 1 | [x] | Study Days 5, 7, 11 |
 | 5 | Filesystems and storage | 1 | 1 | 1 | [x] | Study Days 6, 8, 12 |
 | 6 | Linux investigation practice | 1 | 1 | 1 | [ ] | Study Days 7, 9, 13 |
-| 7 | Linux checkpoint | — | — | — | [ ] | — |
-| 8 | IP and local delivery | — | — | — | [ ] | — |
+| 7 | Linux checkpoint | 1 | 1 | 1 | [ ] | Study Days 8, 10, 14 |
+| 8 | IP and local delivery | 1 | 2 | 1 | [x] | Study Days 9, 11, 15 |
 | 9 | TCP, UDP and sockets | — | — | — | [ ] | — |
 | 10 | DNS, HTTP and TLS | — | — | — | [ ] | — |
 | 11 | Network troubleshooting | — | — | — | [ ] | — |
@@ -216,22 +216,34 @@ Proceed to Day 6. Day 5 guided session is closed, with the expanded benchmark wo
 
 Continue with Day 7 below. Day 6 guided assessment is recorded as 1/1/1, but its completion checkbox remains open for cleanup and independent practical evidence. Do not repeat the Session B discussion. No sustained HTTP slowdown or actual database recovery was demonstrated.
 
-## Day 7 — 2026-11-25 to 2026-11-26 (guided mock finished)
+## Day 7 — 2026-11-25 to 2026-11-26 (guided Kali incident finished)
 
-- Status: guided mock diagnosis, recovery test design and incident summary finished. Independent troubleshooting and final scores remain open. No Day 7 reading completion was reported.
+- Status: guided mock and live Kali incident finished; explanation/evidence/investigation **1/1/1**. Hands-on diagnosis and measured recovery are done, but independent diagnosis, cleanup verification and review reading remain open.
 - Mock evidence only: `/report` normally took 100 ms; some requests took 3–5 s. The learner requested a trace and located the delay in Build report. CPU and runnable wait (70 ms and 15 ms) did not explain the 4.118 s build. A mock syscall trace attributed 3.982 s to `fdatasync`. `iostat` showed a growing device queue, and `pidstat` identified a heavy backup writer whose output shared the report's backing device.
 - Mock recovery only: learner proposed throttling the backup worker and comparing latency. Under comparable request load, mock backup writes fell from 80 to 20 MiB/s, average device queue depth from 30 to 0.4, and `/report` p95 from 4.2 s to 120 ms. This supported backup-induced storage contention in the scenario; no real backup was changed.
 - `pidstat -d` practice: learner matched samples to a request, distinguished write activity from `iodelay`, and corrected the assumption that task write accounting and device writeback must occur in the same interval. Review: if the filesystem wait improves but endpoint latency does not, use a fresh request trace to locate the remaining delay instead of rechecking an already confirmed device improvement.
 - Actual Kali preflight: learner confirmed the same two-CPU Kali ARM64 VM and a 20–30 minute budget. `ss` showed no listener on port 8000 at the time checked; the old Day 6 directory and `index.html` still existed and were retained by choice. Other worker cleanup was not verified.
-- Fixture: [day7_checkpoint.py](../labs/day7_checkpoint.py) was smoke-tested outside Kali. The VMware shared folder is configured, but a guest mount was not confirmed. No Day 7 server, latency baseline, or fault measurement was collected in Kali.
+- Live setup: mounted the VMware share in Kali and ran [day7_checkpoint.py](../labs/day7_checkpoint.py) with a 10-minute server timeout. Activated the 45-second fault with an HTTP 204 response. An earlier 409 indicated an already-active scenario; a later probe missed that window and did not capture the fault.
+- Live request timings: four healthy HTTP 200 responses in **0.243–0.532 ms** (median **0.435 ms**). Five requests under the fault took **1.316–1.449 s**; a curl format typo (`http-code` instead of `http_code`) hid the response status in that run. These samples are not enough to estimate p95.
+- Live diagnosis: learner chose per-thread `pidstat` first. Sampled handlers showed 0.00% CPU and scheduler wait, making CPU contention less likely for those threads. With guidance, `ps -L` showed `locks_lock_inode_wait`. `strace -f -T -y` showed worker PID 2598524 repeatedly holding `LOCK_EX` on `report.txt` for about 1.6 s. Report handlers requested `LOCK_SH` on the same file and completed their 1.36–1.44 s lock calls just after `LOCK_UN`. This was file-lock contention, not the storage contention in the earlier mock incident.
+- Live recovery: after the scenario expired, five shared lock acquisitions took **29–173 µs** and all five subsequent `curl` requests returned HTTP 200 in **0.554–0.952 ms** without tracing. The worker's lock type was not changed. A shared lock would only be appropriate if the worker did not require exclusive access.
+- Cleanup: learner chose to skip the check. Server and scenario were time-bounded, but shutdown and removal of the lab temporary directory were not verified. Review how CPU counters, wait-channel snapshots and syscall timings answer different questions.
+
+## Day 8 — 2026-11-26 (finished)
+
+- Status: assigned reading and guided Kali practical finished. Explanation/evidence/investigation **1/2/1**: learner independently predicted the route results, with help interpreting neighbor states and clarifying the NAT reply exercise.
+- Reading: learner reported reading the assigned *Systems Performance* sections 10.3.1 Networks and Routing (p. 476), 10.3.3 Encapsulation (p. 478), and 10.6.4 `ip` (p. 512). Additional networking fundamentals and Chapter 4 Observability Tools review are follow-up, not reported complete.
+- Actual evidence: `ip -br -4 addr` showed `eth0` up at `192.168.168.128/24`; `ip -4 route` showed connected `192.168.168.0/24` via `eth0` and DHCP default gateway `192.168.168.2`. Learner predicted correctly that `ip -4 route get 192.168.168.42` would show a direct route and `ip -4 route get 203.0.113.20` would show `via 192.168.168.2`; both lookups confirmed this without sending a packet.
+- Neighbor evidence: `ip -4 neigh show dev eth0` showed a cached `lladdr` for `192.168.168.2` in `STALE` state. Reviewed that `STALE` is not proof of a failure, and that the gateway's MAC is the frame destination while the remote IP remains the packet destination under ordinary routing.
+- Concept practice: solved CIDR and longest-prefix matching examples; explained where a NAT gateway changes the outbound source and restores the inbound destination in a hypothetical exchange. Packet-direction and observation-point wording mattered. Actual VMware NAT placement was not verified. No cleanup required for these read-only commands.
 
 ### Handoff
 
-Resume by listing VMware shares with `vmware-hgfsclient` and mounting the project share read-only with `vmhgfs-fuse` at a temporary mount point. Start `timeout 10m python3 labs/day7_checkpoint.py` from the shared project directory (or use the mounted script's absolute path). In a second terminal, collect five healthy `curl` status and `time_total` samples at `http://127.0.0.1:8077/report` before activating the scenario. Keep the cause hidden and let the learner choose their checks. Verify recovery while the server is still running, then stop it and confirm cleanup before marking the milestone complete.
+Start Day 9 (TCP, UDP and sockets). Review destination IP vs. next-hop IP vs. destination MAC, then carry on with one exercise at a time. Before asking the learner to run a command, explain why it is useful, what its flags mean, and which output fields to inspect. For networking questions, identify the packet's direction and where it is being observed.
 
 ## Deferred-work backlog
 
-These items remain open; they do not block starting Day 7. Priorities indicate follow-up order, not permission to run workloads or change kernel settings without checking the current environment.
+These items remain open; they do not block starting Day 9. Priorities indicate follow-up order, not permission to run workloads or change kernel settings without checking the current environment.
 
 | Priority | Item | Current evidence / limit | Next bounded action |
 |---|---|---|---|
@@ -244,7 +256,7 @@ These items remain open; they do not block starting Day 7. Priorities indicate f
 | Medium | Day 2 signals | SIGINT status reported; SIGTERM handler/SIGKILL comparison unverified | Repeat on an identified disposable process, verify exit and cleanup |
 | Low | Day 3 contention scheduling | CPU saturation demonstrated; involuntary switches and per-thread scheduling wait not measured | Short bounded contention run with per-thread scheduling metrics |
 | Low | Day 4 faults/pressure/logs | First-touch counts mocked; PSI and OOM/allocation logs not collected | Measure bounded first-touch faults, read PSI and permitted existing logs; do not force host-wide exhaustion |
-| Low | Independent investigation / Day 1 reading | Prior scores remain guided; Day 1 methodology reading unconfirmed | Use Day 7 to assess independent reasoning and revisit relevant methodology sections |
+| Low | Independent Linux investigation and observability review | Day 7 live diagnosis and recovery were measured with guidance; Chapter 4 review remains unread or unconfirmed | Try a different short incident independently; review counters, tracing, profiling and `/proc` |
 
 ## Session entry template
 Copy once per session. Schedule recall roughly 1, 3 and 7 study days later; shorten review if recall is strong.

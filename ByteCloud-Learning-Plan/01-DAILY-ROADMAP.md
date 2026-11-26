@@ -76,23 +76,25 @@ Guided assessment finished on 2026-11-25: explanation/evidence/investigation 1/1
 
 ## Day 7: Linux checkpoint
 
-- [ ] **Understand:** Recall and combine Days 1–6.
-- [ ] **Read:** Review only; use the reading map to select a short section.
-- [ ] **Practise:** Repeat one unfamiliar Linux incident and write a short incident report.
-- [ ] **Demonstrate:** Identify the affected resource, process, evidence and recovery; review weak areas.
-- [ ] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
+- [x] **Understand:** Recall and combine Days 1–6 with guidance.
+- [ ] **Read:** Review only; the Observability Tools refresher was assigned, not yet reported read.
+- [x] **Practise:** Investigate an unfamiliar Linux incident in Kali and summarize it.
+- [x] **Demonstrate:** Identify the affected resource, process, evidence and measured recovery with guidance.
+- [x] **Record:** Evidence, interpretation and remaining gaps; cleanup verification was skipped by choice.
 
-Guided `/report` mock investigation and recovery reasoning finished on 2026-11-26, including `pidstat -d` interpretation. Day 7 is still open: the independent Kali lab has not started. Resume by mounting the VMware share and collecting the healthy baseline; see [the Day 7 handoff](05-PROGRESS-TRACKER.md#day-7--2026-11-25-to-2026-11-26-guided-mock-finished).
+The guided practical finished on 2026-11-26: file-lock contention was reproduced, diagnosed and recovery measured in Kali. Independent diagnosis is not yet demonstrated. See [the Day 7 evidence](05-PROGRESS-TRACKER.md#day-7--2026-11-25-to-2026-11-26-guided-kali-incident-finished).
 
 **AI prompt:** “Start Day 7: Linux checkpoint. Follow the tutor contract, check my prerequisites, and guide one exercise at a time. Assess whether I can identify the affected resource, process, evidence and recovery; review weak areas.”
 
 ## Day 8: IP and local delivery
 
-- [ ] **Understand:** TCP/IP layers; IPv4; CIDR; subnetting; routes; ARP; NAT.
-- [ ] **Read:** Networking course material; use the reading map to select a short section.
-- [ ] **Practise:** Inspect ip addr and ip route; explain a local destination and a routed destination; solve two CIDR examples.
-- [ ] **Demonstrate:** Describe the next hop and where address translation may occur.
-- [ ] **Record:** prediction, actual evidence, interpretation, cleanup and one unresolved question.
+- [x] **Understand:** TCP/IP layers for local delivery; IPv4; CIDR; subnetting; routes; ARP; NAT.
+- [x] **Read:** Assigned *Systems Performance* sections 10.3.1, 10.3.3 and 10.6.4. Broader networking fundamentals review remains optional follow-up.
+- [x] **Practise:** Inspect Kali's addresses, routes and neighbor table; verify local versus routed decisions and solve CIDR examples.
+- [x] **Demonstrate:** Describe the next hop and explain address translation in a hypothetical exchange.
+- [x] **Record:** Predictions, actual evidence and the unverified location of NAT in VMware. No cleanup needed for the read-only checks.
+
+Day 8 finished on 2026-11-26. Continue to Day 9 after a brief review; see [the handoff](05-PROGRESS-TRACKER.md#day-8--2026-11-26-finished).
 
 **AI prompt:** “Start Day 8: IP and local delivery. Follow the tutor contract, check my prerequisites, and guide one exercise at a time. Assess whether I can describe the next hop and where address translation may occur.”
 

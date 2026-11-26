@@ -56,3 +56,11 @@ Scheduling refresher: 3.2.9 Schedulers (p. 98). Optional depth: 6.4.2 Software (
 Read first: 7.2.1 Virtual Memory (p. 267); 7.2.2 Paging (p. 268); 7.2.3 Demand Paging (p. 269); 7.2.4 Overcommit (p. 270); 7.2.5 Swapping (p. 271); 7.2.6 File System Cache Usage (p. 271); 7.2.7 Utilization and Saturation (p. 271); 7.3.3 Process Address Space (p. 284).
 
 Use during practicals: 7.5.1 vmstat (p. 295); 7.5.5 ps (p. 304); 7.5.6 top (p. 305); 7.5.8 pmap (p. 306); 8.6.7 free (p. 376). OOM is not separately indexed in the supplied contents; supplement with kernel documentation and permitted logs. Defer detailed architecture and tuning.
+
+## Verified Day 8 reading: Chapter 10 — Network (p. 473)
+
+Read 10.3.1 Networks and Routing (p. 476), 10.3.3 Encapsulation (p. 478), and 10.6.4 `ip` (p. 512). Supplement with networking course material for CIDR, ARP and NAT as needed.
+
+## Observability refresher: Chapter 4 — Observability Tools (p. 115)
+
+Start with 4.1.1 Counters (p. 116), 4.1.2 Tracing (p. 118), and 4.1.3 Profiling (p. 119). Skim 4.2.1 `/proc` (p. 121); use 4.2.4 Delay Accounting (p. 130) to review waiting for CPU versus waiting on I/O. Defer DTrace and SystemTap. Use the Day 7 incident to compare what `pidstat`, `ps`, and `strace` can establish.
